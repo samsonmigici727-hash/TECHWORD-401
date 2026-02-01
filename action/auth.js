@@ -1,1 +1,56 @@
-const _0x327b4b=_0x3151;function _0x4b10(){const _0xae2c47=['11081OTsWFr','existsSync','zokk','51915zROqFo','SESSION','3190204DxFjXn','15504302IyLUyc','env','log','10cnhPqc','exports','writeFileSync','5nZQJqu','utf8','32VMdzNa','2586nSZQoC','3137181eDRvRS','./session/creds.json','Session\x20is\x20invalid:\x20','6626727GCjCwB','1627224wAIgPk'];_0x4b10=function(){return _0xae2c47;};return _0x4b10();}(function(_0x3cc3dc,_0x4f0452){const _0x1eb66c=_0x3151,_0x307b89=_0x3cc3dc();while(!![]){try{const _0x514190=parseInt(_0x1eb66c(0x193))/0x1*(parseInt(_0x1eb66c(0x19e))/0x2)+-parseInt(_0x1eb66c(0x18b))/0x3+-parseInt(_0x1eb66c(0x195))/0x4*(-parseInt(_0x1eb66c(0x19c))/0x5)+parseInt(_0x1eb66c(0x19f))/0x6*(parseInt(_0x1eb66c(0x190))/0x7)+parseInt(_0x1eb66c(0x18f))/0x8+parseInt(_0x1eb66c(0x18e))/0x9+parseInt(_0x1eb66c(0x199))/0xa*(-parseInt(_0x1eb66c(0x196))/0xb);if(_0x514190===_0x4f0452)break;else _0x307b89['push'](_0x307b89['shift']());}catch(_0x26eab2){_0x307b89['push'](_0x307b89['shift']());}}}(_0x4b10,0xc2151));const fs=require('fs'),session=process[_0x327b4b(0x197)][_0x327b4b(0x194)]||'';function _0x3151(_0x4d304e,_0x2bbeb5){const _0x4b1019=_0x4b10();return _0x3151=function(_0x3151e7,_0x119302){_0x3151e7=_0x3151e7-0x18b;let _0x562a94=_0x4b1019[_0x3151e7];return _0x562a94;},_0x3151(_0x4d304e,_0x2bbeb5);}async function authentication(){const _0x3c8d07=_0x327b4b;try{const _0x4e1abc=_0x3c8d07(0x18c);if(!fs[_0x3c8d07(0x191)](_0x4e1abc))console['log']('Connecting...'),await fs[_0x3c8d07(0x19b)](_0x4e1abc,atob(session),_0x3c8d07(0x19d));else session!==_0x3c8d07(0x192)&&await fs['writeFileSync'](_0x4e1abc,atob(session),_0x3c8d07(0x19d));}catch(_0xf348d3){console[_0x3c8d07(0x198)](_0x3c8d07(0x18d)+_0xf348d3);return;}}module[_0x327b4b(0x19a)]=authentication;
+const fs = require('fs');
+const path = require('path');
+require('dotenv').config(); //
+
+const session = process.env.SESSION || '';
+
+async function authentication() {
+  const sessionDir = path.join(__dirname, '../Sessions');
+  const credsFile = path.join(sessionDir, 'creds.json');
+
+  try {
+    // 1. Ensure the directory exists
+    if (!fs.existsSync(sessionDir)) {
+      fs.mkdirSync(sessionDir, { recursive: true });
+    }
+
+    // 2. Only process if credentials are missing
+    if (!fs.existsSync(credsFile)) {
+      if (!session) return console.log('❌ No SESSION ID found in .env');
+
+      // HYBRID LOGIC: Detect format
+      if (session.includes(";;;") || session.length > 100) {
+        // CASE A: Direct Base64 String (like yours)
+        console.log('🛠️ Detected direct Base64 session string. Processing...');
+        
+        // Remove prefix if present (e.g., BLACK MD;;;)
+        const base64Data = session.includes(";;;") ? session.split(";;;")[1] : session;
+        
+        // Use Buffer to decode reliably for Node.js
+        const decryptedData = Buffer.from(base64Data.trim(), 'base64').toString('utf-8');
+        
+        // Use Synchronous write to ensure file is ready before Baileys starts
+        fs.writeFileSync(credsFile, decryptedData);
+        console.log("✅ Credentials injected successfully from .env string!");
+        
+      } else {
+        // CASE B: Mega.nz ID
+        console.log('⏳ Detected Mega ID. Attempting download...');
+        const sessdata = session.replace("TECH WORLD 401", '').trim();
+        const { File } = require('megajs');
+        
+        const filer = await File.fromURL(`https://mega.nz/file/${sessdata}`);
+        const data = await new Promise((resolve, reject) => {
+          filer.download((err, data) => err ? reject(err) : resolve(data));
+        });
+        
+        fs.writeFileSync(credsFile, data);
+        console.log("✅ Session downloaded from Mega successfully!");
+      }
+    }
+  } catch (err) {
+    console.log("❌ Authentication processing failed: " + err.message);
+  }
+}
+
+module.exports = authentication;
