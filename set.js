@@ -2,8 +2,12 @@
 
 There's no need to configure this if you're deploying via Heroku — just set them in the environment variables.*/
 
+require('dotenv').config(); // Load variables from your manual .env file
+
 const sessionName = 'session';
-const session = process.env.SESSION || '';
+// FIX: Prioritize the SESSION from .env and default to empty if not found
+const session = process.env.SESSION || ''; 
+
 const autobio = process.env.AUTOBIO || 'FALSE';
 const autolike = process.env.AUTOLIKE_STATUS || 'TRUE';
 const autoviewstatus = process.env.AUTOVIEW_STATUS || 'TRUE';
@@ -16,10 +20,10 @@ const mode = process.env.MODE || 'PRIVATE';
 const anticall = process.env.AUTOREJECT_CALL || 'TRUE';
 const botname = process.env.BOTNAME || 'TECH WORLD 401';
 const antibot = process.env.ANTIBOT || 'FALSE';
-const author = process.env.STICKER_AUTHOR ||'𝗕𝗢𝗧';
+const author = process.env.STICKER_AUTHOR || '𝗕𝗢𝗧';
 const packname = process.env.STICKER_PACKNAME || '𝐁𝐋𝐀𝐂𝐊𝐌𝐄𝐑𝐂𝐇𝐀𝐍𝐓';
 const antitag = process.env.ANTITAG || 'TRUE';
-const dev = process.env.DEV || '254751815027,254105309571';
+const dev = process.env.DEV || '254739285768';
 const menulink = process.env.MENU_LINK || 'https://files.catbox.moe/jxxwms.jpeg';
 const menu = process.env.MENU_TYPE || 'IMAGE';
 const DevRaven = dev.split(",");
@@ -35,7 +39,45 @@ const wapresence = process.env.WA_PRESENCE || 'recording';
 const antilink = process.env.ANTILINK || 'TRUE';
 const mycode = process.env.CODE || '254';
 const antiforeign = process.env.ANTIFOREIGN || 'TRUE';
-const port = process.env.PORT || 10000;
+
+// FIX: Prioritize the Panel's assigned port over hardcoded values to prevent crashes
+const port = process.env.PORT || 3000; 
+
 const antilinkall = process.env.ANTILINK_ALL || 'TRUE';
 
-module.exports = { session, sessionName, autobio, author, packname, dev, DevRaven, badwordkick, bad, mode, group, NotOwner, botname, botAdmin, antiforeign, menu, autoread, antilink, admin, mycode, antilinkall, anticall, antitag, antidel, wapresence, welcomegoodbye, antibot, herokuapi, prefix, port, gptdm, appname, autolike, autoviewstatus };  
+module.exports = { 
+    session, 
+    sessionName, 
+    autobio, 
+    author, 
+    packname, 
+    dev, 
+    DevRaven, 
+    badwordkick, 
+    bad, 
+    mode, 
+    group, 
+    NotOwner, 
+    botname, 
+    botAdmin, 
+    antiforeign, 
+    menu, 
+    autoread, 
+    antilink, 
+    admin, 
+    mycode, 
+    antilinkall, 
+    anticall, 
+    antitag, 
+    antidel, 
+    wapresence, 
+    welcomegoodbye, 
+    antibot, 
+    herokuapi, 
+    prefix, 
+    port, 
+    gptdm, 
+    appname, 
+    autolike, 
+    autoviewstatus 
+};
